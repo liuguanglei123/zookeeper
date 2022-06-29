@@ -7,3 +7,10 @@ Zookeeper从设计模式角度来理解，是一个基于观察者模式设计�
 总结：Zookeeper = 文件系统 + 通知机制
 
 ![zk工作原理](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_work_theory.png)
+
+## zk特点
+
+![zk工作原理](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_charactistic.png)
+
+* zk集群：一个领导者（leader），多个跟随者（follower）组成
+* 集群中只要有半数以上的节点存活，zk集群就能够正常服务
