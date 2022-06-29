@@ -6,4 +6,4 @@ Zookeeper从设计模式角度来理解，是一个基于观察者模式设计�
 
 总结：Zookeeper = 文件系统 + 通知机制
 
-#[](")
+#[]("https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_work_theory.png")
