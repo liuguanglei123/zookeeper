@@ -10,7 +10,32 @@ Zookeeper从设计模式角度来理解，是一个基于观察者模式设计�
 
 ## zk特点
 
-![zk工作原理](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_charactistic.png)
+![zk工作原理](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_characteristic.png)
 
 * zk集群：一个领导者（leader），多个跟随者（follower）组成
 * 集群中只要有半数以上的节点存活，zk集群就能够正常服务
+* 全局数据一致：每个Server保存一份想通过的数据副本，Client无论连接到哪个Server，数据都是一致的。
+* 更新请求顺序进行，来自同一个client的更新请求按其发送顺序依次执行
+* 数据更新原子性，一次数据更新要么成功，要么失败
+* 实时性，在一定时间范围内，client能读到最新数据
+
+## 数据结构
+zk数据模型的结构与Unix文件系统类似，整体可以看做是一棵树，每个节点称作一个ZNode。
+每一个ZNode默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
