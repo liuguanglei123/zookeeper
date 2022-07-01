@@ -50,8 +50,21 @@ zk数据模型的结构与Unix文件系统类似，整体可以看做是一棵�
 
 ![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_config.png)
 
+## 统一集群管理
+1) 分布式环境中国，实时掌握每个节点的状态是必要的
 
+(1) 可以根绝节点实时状态做出一些调整
 
+2) ZK可以实现实时监控节点状态变化
+
+(1) 可将节点信息写入ZK上的一个ZNode
+(2) 监听这个Znode可获取它的实时状态变化
+
+## 服务器动态上下线
+![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_dymanic_online.png)
+
+## 软负载均衡
+![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_load_balancing.png)
 
 
 
