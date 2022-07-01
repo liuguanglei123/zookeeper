@@ -21,13 +21,21 @@ Zookeeper从设计模式角度来理解，是一个基于观察者模式设计�
 
 ## 数据结构
 zk数据模型的结构与Unix文件系统类似，整体可以看做是一棵树，每个节点称作一个ZNode。
+
 每一个ZNode默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
+
 ![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_data_struct.png)
 
 ## 应用场景
 在分布式环境下，经常需要对应用/服务进行统一命名，便于识别。
+
 例如：IP不容易被识别，而域名更容易识别
+
+如下图，当client想要访问 www.baidu.com时，可以从节点上选取其中一个子节点的值来使用，
+这样我们只需要记住 www.baidu.com即可，不需要记忆具体的ip地址
+
 ![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_name_service.png)
+
 
 
 
