@@ -31,14 +31,24 @@ zk数据模型的结构与Unix文件系统类似，整体可以看做是一棵�
 
 例如：IP不容易被识别，而域名更容易识别
 
-如下图，当client想要访问 www.baidu.com时，可以从节点上选取其中一个子节点的值来使用，
-这样我们只需要记住 www.baidu.com即可，不需要记忆具体的ip地址
+如下图，当client想要访问 orderService 时，可以从节点上选取其中一个子节点的值来使用，
+这样我们只需要记住 orderService 即可，不需要记忆具体的ip地址
 
 ![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_name_service.png)
 
+## 统一配置管理
+1) 分布式环境下，配置文件同步非常常见
 
+(1) 一般要求一个集群中，所有节点的配置信息是一致的，比如kafka集群
+(2) 对配置文件修改后，希望能够快速同步到各个节点上
 
+2) 配置管理可以交由Zk实现
 
+(1) 可以将配置信息写入ZK上的一个ZNode
+(2) 各个客户端监听这个ZNode
+(3) 一旦Znode中的数据被修改，ZK将通知各个客户端
+
+![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_config.png)
 
 
 
