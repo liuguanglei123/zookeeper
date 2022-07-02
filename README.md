@@ -64,7 +64,200 @@ zk数据模型的结构与Unix文件系统类似，整体可以看做是一棵�
 ![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_dymanic_online.png)
 
 ## 软负载均衡
+在ZK中记录每台服务器的访问数，让访问数最少的服务器去处理最新的客户端请求
 ![zk数据结构](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_load_balancing.png)
+
+# zk安装
+下载zookeeper 最新版镜像
+```
+docker search zookeeper    
+docker pull zookeeper 
+docker images              //查看下载的本地镜像
+docker inspect zookeeper   //查看zookeeper详细信息
+新建一个文件夹
+mkdir zookeeper
+挂载本地文件夹并启动服务
+docker run -d -e TZ="Asia/Shanghai" -p 2181:2181 -v /root/docker/zookeeper:/data --name zookeeper --restart always 3721c1c97fbd
+
+参数解释
+-e TZ="Asia/Shanghai" # 指定上海时区 
+-d # 表示在一直在后台运行容器
+-p 2181:2181 # 对端口进行映射，将本地2181端口映射到容器内部的2181端口
+--name # 设置创建的容器名称
+-v # 将本地目录(文件)挂载到容器指定目录；
+--restart always #始终重新启动zookeeper
+进入容器(zookeeper)
+docker exec -it zookeeper bash 
+
+如果启动时需要加一些参数，比如 设置ZOO_INIT_LIMIT=10，可以用下面的命令
+docker run -e "ZOO_INIT_LIMIT=10" --name some-zookeeper --restart always -d zookeeper
+
+```
+
+Zookeeper中的配置文件zoo.cfg中参数含义解读如下：
+1) tickTime =2000：通信心跳数，Zookeeper服务器与客户端心跳时间，单位毫秒
+
+Zookeeper使用的基本时间，服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个tickTime时间就会发送一个心跳，时间单位为毫秒。
+它用于心跳机制，并且设置最小的session超时时间为两倍心跳时间。(session的最小超时时间是2*tickTime)
+
+2) initLimit =10：LF初始通信时限
+
+集群中的Follower跟随者服务器与Leader领导者服务器之间初始连接时能容忍的最多心跳数（tickTime的数量），用它来限定集群中的Zookeeper服务器连接到Leader的时限。
+
+3) syncLimit =5：LF同步通信时限
+
+集群中Leader与Follower之间的最大响应时间单位，假如响应超过syncLimit * tickTime，Leader认为Follwer死掉，从服务器列表中删除Follwer。
+
+4) dataDir：数据文件目录+数据持久化路径
+
+主要用于保存Zookeeper中的数据。
+
+5) clientPort =2181：客户端连接端口
+
+监听客户端连接的端口。
+
+zk客户端启动
+
+bin/zkCli.sh
+
+
+## 分布式安装部署
+1）集群规划
+
+在hadoop102、hadoop103和hadoop104三个节点上部署Zookeeper。
+
+2）解压安装
+
+（1）解压Zookeeper安装包到/opt/module/目录下
+
+[atguigu@hadoop102 software]$ tar -zxvf zookeeper-3.5.7.tar.gz -C /opt/module/
+
+（2）同步/opt/module/zookeeper-3.5.7目录内容到hadoop103、hadoop104
+
+[atguigu@hadoop102 module]$ xsync zookeeper-3.5.7/
+
+3）配置服务器编号
+
+（1）在/opt/module/zookeeper-3.5.7/这个目录下创建zkData
+
+[atguigu@hadoop102 zookeeper-3.5.7]$ mkdir -p zkData
+
+（2）在/opt/module/zookeeper-3.5.7/zkData目录下创建一个myid的文件
+
+[atguigu@hadoop102 zkData]$ touch myid
+
+添加myid文件，注意一定要在linux里面创建，在notepad++里面很可能乱码
+
+（3）编辑myid文件
+
+[atguigu@hadoop102 zkData]$ vi myid
+
+在文件中添加与server对应的编号：2
+
+（4）拷贝配置好的zookeeper到其他机器上
+
+[atguigu@hadoop102 zkData]$ xsync myid
+
+并分别在hadoop103、hadoop104上修改myid文件中内容为3、4
+
+4）配置zoo.cfg文件
+
+（1）重命名/opt/module/zookeeper-3.5.7/conf这个目录下的zoo_sample.cfg为zoo.cfg
+
+[atguigu@hadoop102 conf]$ mv zoo_sample.cfg zoo.cfg
+
+（2）打开zoo.cfg文件
+
+[atguigu@hadoop102 conf]$ vim zoo.cfg
+
+修改数据存储路径配置
+
+dataDir=/opt/module/zookeeper-3.5.7/zkData
+
+增加如下配置
+
+#######################cluster##########################
+
+server.2=hadoop102:2888:3888
+
+server.3=hadoop103:2888:3888
+
+server.4=hadoop104:2888:3888
+
+（3）同步zoo.cfg配置文件
+
+[atguigu@hadoop102 conf]$ xsync zoo.cfg
+
+（4）配置参数解读
+
+server.A=B:C:D。
+
+A是一个数字，表示这个是第几号服务器；
+
+集群模式下配置一个文件myid，这个文件在dataDir目录下，这个文件里面有一个数据就是A的值，Zookeeper启动时读取此文件，拿到里面的数据与zoo.cfg里面的配置信息比较从而判断到底是哪个server。
+
+B是这个服务器的地址；
+
+C是这个服务器Follower与集群中的Leader服务器交换信息的端口；
+
+D是万一集群中的Leader服务器挂了，需要一个端口来重新进行选举，选出一个新的Leader，而这个端口就是用来执行选举时服务器相互通信的端口。
+
+5）集群操作
+
+（1）分别启动Zookeeper
+
+[atguigu@hadoop102 zookeeper-3.5.7]$ bin/zkServer.sh start
+
+[atguigu@hadoop103 zookeeper-3.5.7]$ bin/zkServer.sh start
+
+[atguigu@hadoop104 zookeeper-3.5.7]$ bin/zkServer.sh start
+
+（2）查看状态
+
+[atguigu@hadoop102 zookeeper-3.5.7]# bin/zkServer.sh status
+
+JMX enabled by default
+
+Using config: /opt/module/zookeeper-3.5.7/bin/../conf/zoo.cfg
+
+Mode: follower
+
+[atguigu@hadoop103 zookeeper-3.5.7]# bin/zkServer.sh status
+
+JMX enabled by default
+
+Using config: /opt/module/zookeeper-3.5.7/bin/../conf/zoo.cfg
+
+Mode: leader
+
+[atguigu@hadoop104 zookeeper-3.5.7]# bin/zkServer.sh status
+
+JMX enabled by default
+
+Using config: /opt/module/zookeeper-3.5.7/bin/../conf/zoo.cfg
+
+Mode: follower
+
+## 客户端命令行操作
+| 命令基本语法  |   功能描述   |
+| ------------- | ------------- |
+| help  | 显示所有操作命令  |
+| ls path  | 使用 ls 命令来查看当前znode的子节点  |
+| -w  | 监听子节点变化  |
+| -s  | 附加次级信息  |
+| create  | 普通创建  |
+| -e  | 临时（重启或者超时消失）  |
+| get path  | 获得节点的值  |
+| set  | 设置节点的具体值  |
+| stat  | 查看节点状态  |
+| delete  | 删除节点  |
+| deleteall  | 递归删除节点  |
+
+
+
+
+
+
 
 
 
