@@ -243,18 +243,28 @@ Mode: follower
 | ------------- | ------------- |
 | help  | 显示所有操作命令  |
 | ls path  | 使用 ls 命令来查看当前znode的子节点  |
-| -w  | 监听子节点变化  |
-| -s  | 附加次级信息  |
-| create  | 普通创建  |
-| -e  | 临时（重启或者超时消失）  |
+| ls -w path  | 监听子节点变化  |
+| ls -s path  | 附加次级信息（包含创建时间等信息）  |
+| create nodename | 普通创建节点  |
+| create -e nodename  | 创建临时节点（重启或者超时消失）  |
+| create -s nodename  | 创建一个带序号的节点  |
 | get path  | 获得节点的值  |
-| set  | 设置节点的具体值  |
+| get -w path  | 获得节点的值  |
+| get path  | 获得节点的值  |
+| set path pathContent | 设置节点的具体值,pathContent是一个字符串（设置多次会覆盖，类似map的put方法）   |
 | stat  | 查看节点状态  |
 | delete  | 删除节点  |
 | deleteall  | 递归删除节点  |
 
+# ZK的API操作
+请查看 ZookeeperTest.java 文件内容
 
+# Zookeeper内部原理
+## 节点类型
+![zk节点类型](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_node_type.png)
 
+## Stat结构体
+![zk节点类型](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_stat_1.png)
 
 
 

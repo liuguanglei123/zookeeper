@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id="accountDao" class="com.chucan.spring.dao.impl.JDBCAccountDaoImpl">
+        <property name="ConnectionUtils" ref="connectionUtils"/>
+    </bean>
+
+    <bean id="transferService" class="com.chucan.spring.service.impl.TransferServiceImpl">
+        <!--set+ name 之后锁定到传值的set方法了，通过反射技术可以调用该方法传入对应的值-->
+        <property name="AccountDao" ref="accountDao"></property>
+    </bean>
+
+    <bean id="transferService" class="com.chucan.spring.utils.ConnectionUtils"></bean>
+
+    <!--事务管理器-->
+    <bean id="transactionManager" class="com.chucan.spring.utils.TransactionManager">
+        <property name="ConnectionUtils" ref="connectionUtils"/>
+    </bean>
+
+    <!--代理对象工厂-->
+    <bean id="proxyFactory" class="com.chucan.spring.factory.ProxyFactory">
+        <property name="TransactionManager" ref="transactionManager"/>
+    </bean>
+</beans>
