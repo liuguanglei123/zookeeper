@@ -320,3 +320,20 @@ Mode: follower
 
 当集群中的leader挂掉，集群会重新选举出一个新的leader，此时首先会比较每一台机器的czxid，
 czxid最大的被选为leader，极端情况下，czxid都相等的情况下，那么会直接比较myid，myid大的选举为leader。
+
+## 写数据流程
+![zk节点类型](https://github.com/liuguanglei123/zookeeper/blob/main/images/zk_write_data.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
